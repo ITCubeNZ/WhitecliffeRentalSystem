@@ -1,5 +1,6 @@
 const express = require('express');
-const rentalRoutes = require('./routes/RentalRoutes')
+const rentalRoutes = require('./routes/RentalRoutes');
+const dbConfig = require('./dbConfig')
 
 const app = express()
 
