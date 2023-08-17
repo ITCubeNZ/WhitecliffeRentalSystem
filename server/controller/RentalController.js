@@ -1,53 +1,15 @@
-let nodemailer = require('nodemailer')
-const { emailPassword } = require('../securityDetails')
+const con = require("../dbConfig");
 
-
-module.exports.search_get = (req, res) => {
-    res.status(200).json({ response: "Search successful." })
-}
-
-module.exports.item_get = (req, res) => {
-    res.status(200).json({ response: "Got Item" })
-}
-
-module.exports.item_add = (req, res) => {
-    res.status(201).json({ response: "Added Item" })
-}
-
-module.exports.item_update = (req, res) => {
-    res.status(201).json({ response: "Modified Item" })
-}
-
-module.exports.item_delete = (req, res) => {
-    res.status(200).json({ response: "Deleted Item" })
-}
-
-module.exports.item_bookings = (req, res) => {
-    res.status(200).json({ response: "Bookings for ID." })
-}
-
-module.exports.booking_approve = (req, res) => {
-    let transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'whitecliffea@gmail.com',
-            pass: emailPassword
-        }
-    })
-
-    let mailOptions = {
-        from: 'whitecliffea@gmail.com',
-        to: 'benjamincharlesolds@yahoo.com',
-        subject: 'Booking has been approved',
-        text: 'Your equipment has been booked!'
-    }
-
-    transporter.sendMail(mailOptions, function (err, info) {
+module.exports.items_get = (req, res) => {
+    // Used to get all items from the Database and return their information.
+    con.query("SELECT * FROM item", function (err, result, fields) {
         if (err) {
-            console.log(err);
+            console.log(`Query Error Code: ${err.code}`)
+            console.log(`Query Error Message: ${err.sqlMessage}`);
+            res.status(406).json({ response: 'rejected' })
         } else {
-            console.log('Email sent: ' + info.response);
+            console.log(result)
+            res.status(200).json({ response: 'accepted' })
         }
     })
-    res.status(201).json({ response: 'Booking confirmed' })
-}
+}   

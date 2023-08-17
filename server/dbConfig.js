@@ -28,8 +28,10 @@ con.connect(function(error)  {
             );"
         con.query(staffSQL, function (err, result) {
             if (err) {
-                console.log(err.code)
-                console.log(err.sqlMessage)
+                if (!!err.code === 'ER_TABLE_EXISTS_ERROR') {
+                    console.log(err.code)
+                    console.log(err.sqlMessage)    
+                }
             } else {
                 console.log('Staff Table Created')
             }
@@ -47,8 +49,10 @@ con.connect(function(error)  {
             );"
         con.query(studentSQL, function (err, result) {
             if (err) {
-                console.log(err.code)
-                console.log(err.sqlMessage)
+                if (!!err.code === 'ER_TABLE_EXISTS_ERROR') {
+                    console.log(err.code)
+                    console.log(err.sqlMessage)    
+                }
             } else {
                 console.log('Student Table Created')
             }
@@ -65,8 +69,10 @@ con.connect(function(error)  {
             );"
         con.query(itemSQL, function (err, result) {
             if (err) {
-                console.log(err.code)
-                console.log(err.sqlMessage)
+                if (!!err.code === 'ER_TABLE_EXISTS_ERROR') {
+                    console.log(err.code)
+                    console.log(err.sqlMessage)    
+                }
             } else {
                 console.log('Item Table Created.')
             }
@@ -86,14 +92,18 @@ con.connect(function(error)  {
             );"
         con.query(rentalSQL, function (err, result) {
             if (err) {
-                console.log(err.code)
-                console.log(err.sqlMessage)
+                if (!!err.code === 'ER_TABLE_EXISTS_ERROR') {
+                    console.log(err.code)
+                    console.log(err.sqlMessage)    
+                }
             } else {
                 console.log('Rental Table Created.');
             }
         })
     }
 })
+
+module.exports = con
 
 
 
