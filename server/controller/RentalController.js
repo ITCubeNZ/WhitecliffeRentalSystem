@@ -5,11 +5,63 @@ module.exports.items_get = (req, res) => {
     con.query("SELECT * FROM item", function (err, result, fields) {
         if (err) {
             console.log(`Query Error Code: ${err.code}`)
-            console.log(`Query Error Message: ${err.sqlMessage}`);
+            console.log(`Query Error Message: ${err.sqlMessage}`)
             res.status(406).json({ response: 'rejected' })
         } else {
-            console.log(result)
-            res.status(200).json({ response: 'accepted' })
+            res.status(200).json({ response: result })
         }
     })
-}   
+}
+
+module.exports.item_get = (req, res) => {
+    // Used to get a SPECIFIC item from the Database and return their information. The API should be called using the items primary key.
+    con.query(`SELECT * FROM item WHERE item_id = ${req.params.id}`, function (err, result, fields) {
+        if (err) {
+            console.log(`Query Error Code: ${err.code}`)
+            console.log(`Query error Message: ${err.sqlMessage}`)
+            res.status(406).json({ response: 'rejected' } )
+        } else {
+            res.status(200).json({ response: result })
+        }
+    }) 
+}
+
+module.exports.rentals_get = (req, res) => {
+    // Used to get ALL rental requests.
+    con.query(`SELECT * FROM rental`, function (err, result, fields) {
+        if (err) {
+            console.log(`Query Error Code: ${err.code}`)
+            console.log(`Query Error Message: ${err.message}`)
+            res.status(406).json({ response: 'rejected' })
+        } else {
+            res.status(200).json({ response: result })
+        }
+    })
+}
+
+module.exports.rental_get = (req, res) => {
+    // Used to get SPECIFIC rental requests from the database and return their information. The API should be called using the rentals priamry key.
+    con.query(`SELECT * FROM rental WHERE rental_id = ${req.params.id}`, function (err, result, fields) {
+        if (err) {
+            console.log(`Query Error Code: ${err.code}`)
+            console.log(`Query Error Message: ${err.sqlMessage}`)
+            res.status(406).json({ response: rejected })
+        } else {
+            res.status(200).json({ response: result })
+        }
+    })
+}
+
+module.exports.rental_item_get = (req, res) => {
+    // Used to get all rental requests based on an ITEMS primary id. 
+    // EXAMPLE: Get all rentals belonging to a specific monitor. 
+    con.query(`SELECT * FROM rental WHERE item_id = ${req.params.id}`, function (err, result, fields) {
+        if (err) {
+            console.log(`Query Error Code: ${err.code}`)
+            console.log(`Query Error Message: ${err.sqlMessage}`)
+            res.status(406).json({ response: rejected })
+        } else {
+            res.status(200).json({ response: result })
+        }
+    })
+}
