@@ -45,7 +45,7 @@ module.exports.rental_get = (req, res) => {
         if (err) {
             console.log(`Query Error Code: ${err.code}`)
             console.log(`Query Error Message: ${err.sqlMessage}`)
-            res.status(406).json({ response: rejected })
+            res.status(406).json({ response: 'rejected' })
         } else {
             res.status(200).json({ response: result })
         }
@@ -59,9 +59,22 @@ module.exports.rental_item_get = (req, res) => {
         if (err) {
             console.log(`Query Error Code: ${err.code}`)
             console.log(`Query Error Message: ${err.sqlMessage}`)
-            res.status(406).json({ response: rejected })
+            res.status(406).json({ response: 'rejected' })
         } else {
             res.status(200).json({ response: result })
+        }
+    })
+}
+
+module.exports.item_search = (req, res) => {
+    // Used to return results based on item name. 
+    con.query(`SELECT * FROM item WHERE item_name LIKE "%${req.params.searchTerm}%"`, function (err, result, fields) {
+        if (err) {
+            console.log(`Query Error Code: ${err.code}`)
+            console.log(`Query Error Message: ${err.sqlMessage}`)
+            res.status(406).json({ response: 'rejected' })
+        } else {
+            res.status(201).json({ response: result })
         }
     })
 }

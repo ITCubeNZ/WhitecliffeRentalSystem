@@ -12,7 +12,11 @@ var con = mysql.createConnection({
 
 con.connect(function(error)  {
     if (!!error) {
-        console.log(error);
+        if (error.code === 'EAI_FAIL') {
+            console.log(`Error Code: ${error.code}`)
+            console.log(`Error Message: ${error.message}`)
+            console.log(`Note: This Error has been common among development. Make sure IP is accepted and restart the application.`)
+        }
     } else {
         console.log("Database Connected");
         let staffSQL = "CREATE TABLE staff (staff_id INT AUTO_INCREMENT PRIMARY KEY, \
