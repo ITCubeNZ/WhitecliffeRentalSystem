@@ -1,5 +1,5 @@
 const express = require('express');
-const rentalRoutes = require('./routes/RentalRoutes');
+const loanRoutes = require('./routes/LoanRoutes')
 const dbConfig = require('./dbConfig')
 const bodyParser = require('body-parser')
 
@@ -16,4 +16,4 @@ app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
 });
 
-app.use(rentalRoutes)
+app.use(loanRoutes)

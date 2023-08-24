@@ -66,7 +66,7 @@ con.connect(function(error)  {
             item_description VARcHAR(255), \
             item_code INT, \
             replacement_cost float, \
-            purchase_year DATE, \
+            purchase_year YEAR, \
             item_status ENUM('Active', 'Inactive'), \
             item_location VARCHAR(100), \
             last_updated DATE \
@@ -81,12 +81,12 @@ con.connect(function(error)  {
                 console.log('Item Table Created.')
             }
         })
-        let rentalSQL = "CREATE TABLE rental (rental_id INT AUTO_INCREMENT PRIMARY KEY, \
+        let rentalSQL = "CREATE TABLE loan (loan_id INT AUTO_INCREMENT PRIMARY KEY, \
             student_id INT, \
             staff_id INT, \
             item_id INT, \
-            rental_status ENUM('Pending', 'Approved', 'Declined'), \
-            rental_date DATE, \
+            loan_status ENUM('Pending', 'Approved', 'Declined'), \
+            loan_date DATE, \
             return_date DATE, \
             return_condition VARCHAR(255), \
             last_updated DATE, \
@@ -101,7 +101,7 @@ con.connect(function(error)  {
                     console.log(err.sqlMessage)    
                 }
             } else {
-                console.log('Rental Table Created.');
+                console.log('Loan Table Created.');
             }
         })
     }
