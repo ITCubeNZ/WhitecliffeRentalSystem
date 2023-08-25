@@ -1,3 +1,4 @@
+const { Int } = require("mssql");
 const con = require("../dbConfig");
 
 module.exports.items_get = (req, res) => {
@@ -135,6 +136,36 @@ module.exports.item_search_description = (req, res) => {
             res.status(406).json({ response: 'rejected' })
         } else {
             res.status(201).json({ response: result })
+        }
+    })
+}
+
+module.exports.loan_request = (req, res) => {
+    // POST request for a student creating an original loan request. 
+    
+    // Gets the current date to utilise within last updated. 
+    const date = new Date()   
+    let lastUpdated = `'${date.getFullYear()}-${String(date.getMonth()+1).padStart(2, "0")}-${date.getDate()}'`
+
+
+    con.query(`SELECT student_id, f_name, l_name, email FROM student WHERE whitecliffe_id = ${req.body.whitecliffe_id}`, function (err, result, fields) {
+        if (err) {
+            console.log(`Query Error Code: ${err.code}`)
+            console.log(`Query Error Message: ${err.sqlMessage}`)
+            res.status(406).json({ response: 'rejected' })
+        } else {
+            // Store student data in result. 
+            var studentData = result
+            con.query(`INSERT INTO loan (student_id, item_id, loan_status, loan_date, return_date, last_updated) VALUES (${studentData[0].student_id}, ${req.body.item_id}, 'Pending', '${req.body.loan_date}', '${req.body.return_date}', ${lastUpdated})`, function (err, result, fields) {
+                if  (err) {
+                    console.log(`Query Error Code: ${err.code}`)
+                    console.log(`Querry Error Message: ${err.sqlMessage}`)
+                    res.status(406).json({ response: 'rejected' })
+                } else {
+                    // Sends a response back to the user that loan request has been submitted has been submitted.
+                    res.status(201).json({ response: `Loan Request Submitted for ${studentData[0].f_name} ${studentData[0].l_name}.`})
+                }
+            })
         }
     })
 }
