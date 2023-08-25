@@ -25,7 +25,7 @@ con.connect(function(error)  {
             department VARCHAR(50), \
             staff_code INT, \
             username VARCHAR(30), \
-            password VARCHAR(50), \
+            pword VARCHAR(50), \
             phone INT, \
             email VARCHAR(50), \
             last_updated DATE \
@@ -46,7 +46,7 @@ con.connect(function(error)  {
             degree VARCHAR(75), \
             whitecliffe_id INT, \
             username VARCHAR(30), \
-            password VARCHAR(50), \
+            pword VARCHAR(50), \
             phone INT, \
             email VARCHAR(50), \
             last_updated DATE \
