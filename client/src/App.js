@@ -50,7 +50,7 @@ function App() {
     return (
       <>
         {Render()}
-        <div>Please wait...</div>
+        <Login />
       </>
     );
 }
