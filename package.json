@@ -10,7 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@azure/msal-browser": "^3.0.2",
     "@azure/msal-node": "^2.0.0",
+    "@azure/msal-react": "^2.0.2",
     "adal-node": "^0.2.4",
     "axios": "^1.4.0",
     "body-parser": "^1.20.2",
