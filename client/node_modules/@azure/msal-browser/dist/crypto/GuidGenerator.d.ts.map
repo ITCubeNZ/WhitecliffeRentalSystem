@@ -1,0 +1,1 @@
+{"version":3,"file":"GuidGenerator.d.ts","sourceRoot":"","sources":["../../src/crypto/GuidGenerator.ts"],"names":[],"mappings":"AAKA,OAAO,EAAa,cAAc,EAAE,MAAM,oBAAoB,CAAC;AAE/D,OAAO,EAAE,aAAa,EAAE,MAAM,iBAAiB,CAAC;AAChD,qBAAa,aAAc,YAAW,cAAc;IAEhD,OAAO,CAAC,SAAS,CAAgB;gBAErB,SAAS,EAAE,aAAa;IA0BpC,YAAY,IAAI,MAAM;IA4DtB;;;OAGG;IACH,MAAM,CAAC,IAAI,EAAE,MAAM,GAAG,OAAO;CAKhC"}
