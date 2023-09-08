@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, createContext } from "react";
 import "./App.css";
 import { Container } from "react-bootstrap";
 import { useMsal, useMsalAuthentication } from "@azure/msal-react";
@@ -11,6 +11,9 @@ import Book from "./components/Book";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import EquipmentTable from "./components/EquipmentTable";
+
+export const UserContext = createContext();
 
 function App() {
   useMsalAuthentication(InteractionType.Popup);
@@ -27,23 +30,25 @@ function App() {
   if (user !== "")
     return (
       <div className="App">
-        <UnauthenticatedTemplate>
-          <Login />
-        </UnauthenticatedTemplate>
-        <AuthenticatedTemplate>
-          <Header />
-          <div className="flexs">
-            {/* <hi className="mx-auto">Hello {user}</hi>  */}
-            <Container>
-              <Routes>
-                <Route path="/" element={<Home />}></Route>
-                <Route path="/book" element={<Book />}></Route>
-                <Route path="/dashboard" element={<StudentDashBoard />}></Route>
-              </Routes>
-            </Container>
-          </div>
-          <Footer />
-        </AuthenticatedTemplate>
+        <UserContext.Provider value={user}>
+          <UnauthenticatedTemplate>
+            <Login />
+          </UnauthenticatedTemplate>
+          <AuthenticatedTemplate>
+            <Header />
+            <div className="flexs">
+              {/* <hi className="mx-auto">Hello {user}</hi>  */}
+              <Container>
+                <Routes>
+                  {/* <Route path="/" element={<EquipmentTable />}></Route> */}
+                  <Route path="/book" element={<Book />}></Route>
+                  <Route path="/dashboard" element={<StudentDashBoard />}></Route>
+                </Routes>
+              </Container>
+            </div>
+            <Footer />
+          </AuthenticatedTemplate>
+        </UserContext.Provider>
       </div>
     );
   else
