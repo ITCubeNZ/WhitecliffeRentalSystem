@@ -6,6 +6,7 @@ import { InteractionType } from "@azure/msal-browser";
 import { AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
 import Home from "./components/Home";
 import Login from "./components/Login";
+import TeacherDashBoard from "./components/TeacherDashBoard";
 import StudentDashBoard from "./components/StudentDashBoard";
 import Book from "./components/Book";
 import Footer from "./components/Footer";
@@ -40,9 +41,10 @@ function App() {
               {/* <hi className="mx-auto">Hello {user}</hi>  */}
               <Container>
                 <Routes>
-                  {/* <Route path="/" element={<EquipmentTable />}></Route> */}
+                  <Route path="/" exact element={<EquipmentTable />}></Route>
                   <Route path="/book" element={<Book />}></Route>
                   <Route path="/dashboard" element={<StudentDashBoard />}></Route>
+                  <Route path="/teacher" element={<TeacherDashBoard />}></Route>
                 </Routes>
               </Container>
             </div>
