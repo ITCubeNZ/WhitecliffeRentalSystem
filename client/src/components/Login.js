@@ -5,12 +5,14 @@ import MainHeader from "./MainHeader";
 import { Container } from "react-bootstrap";
 import Footer from "./Footer";
 import "../App.css";
+import { useNavigate } from "react-router-dom";
 
 function LoginButton() {
   const { instance } = useMsal();
-
+  const navigate = useNavigate();
   const handleLogin = () => {
     instance.loginPopup();
+    navigate("/");
     //setIsAuthenticated(true);
   };
 

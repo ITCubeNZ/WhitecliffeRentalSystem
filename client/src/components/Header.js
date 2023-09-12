@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
 import mainLogo from "../img/Whitecliff_Logo.png";
 import { FiUser } from "react-icons/fi";
 import { useMsal } from "@azure/msal-react";
 import { BrowserRouter as Router, Link } from "react-router-dom";
+import { UserContext } from "../App";
 
 const Header = () => {
+  const user = useContext(UserContext);
   const { instance } = useMsal();
 
   const handleLogout = () => {
@@ -39,11 +41,16 @@ const Header = () => {
                     Dashboard
                   </Nav.Link>
                 </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link as={Link} to={"/teacher"}>
+                    Teacher
+                  </Nav.Link>
+                </Nav.Item>
               </Nav>
 
               <Nav>
                 <NavDropdown title={<FiUser className=" text userIcon" />} id="collasible-nav-dropdown">
-                  <NavDropdown.Item href="#action/3.2">Username</NavDropdown.Item>
+                  <NavDropdown.Item href="#action/3.2">{user}</NavDropdown.Item>
                   <NavDropdown.Item href="" onClick={handleLogout}>
                     Logout
                   </NavDropdown.Item>
