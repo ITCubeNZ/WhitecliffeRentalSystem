@@ -41,6 +41,11 @@ const Header = () => {
                     Dashboard
                   </Nav.Link>
                 </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link as={Link} to={"/teacher"}>
+                    Teacher
+                  </Nav.Link>
+                </Nav.Item>
               </Nav>
 
               <Nav>
