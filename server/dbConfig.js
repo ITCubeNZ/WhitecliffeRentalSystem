@@ -2,7 +2,7 @@ const mysql = require('mysql');
 const { dbPassword } = require('./securityDetails');
 
 var con = mysql.createConnection({
-    host: "whitecliffe2.mysql.database.azure.com",
+    host: "whitecliffe.mysql.database.azure.com",
     user: "dbadmin",
     password: dbPassword,
     database: "whitecliffe",
