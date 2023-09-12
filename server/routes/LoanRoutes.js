@@ -7,10 +7,10 @@ router.get('/api/item/:id', loanController.item_get)
 router.get('/api/loans', loanController.loans_get)
 router.get('/api/loans/:id', loanController.loan_get)
 router.get('/api/loans/item/:id', loanController.loan_item_get)
+router.get('/api/get_requests', loanController.get_requests)
 router.post('/api/loans/request', loanController.loan_request)
 router.patch('/api/loans/approve', loanController.loan_approve)
 router.patch('/api/loans/decline', loanController.loan_decline)
-router.get('/pending/', loanController.pending)
 router.post('/api/loans/status', loanController.status_date)
 
 module.exports = router

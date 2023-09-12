@@ -415,7 +415,19 @@ module.exports.status_date = (req, res) => {
     })
 }
 
-module.exports.pending = (req, res) => {
-    // GET response to get pending requests
-    res.status(200).json({ response: 'accepted' })
+module.exports.get_requests = (req, res) => {
+    // Get Pending Requests
+    con.query("select * from loan where loan_status = 'Pending'", function (err, result) {
+        if (err) {
+            console.log(`Error Code: ${err.code}`)
+            console.log(`Error Message: ${err.sqlMessage}`)
+            res.status(406).json({ response: "Error With Getting Pending Requests" })
+        } else {
+            if (result.length === 0) {
+                res.status(200).json({ response: "No requests found." })
+            } else {
+                res.status(200).json({ result })
+            }
+        }
+    })
 }
