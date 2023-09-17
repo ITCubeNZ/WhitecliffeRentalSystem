@@ -148,286 +148,184 @@ module.exports.item_search_description = (req, res) => {
     })
 }
 
-module.exports.loan_request = (req, res) => {
-    // POST request for a student creating an original loan request. 
-    // Gets the current date to utilise within last updated. 
-    const date = new Date()   
-    let lastUpdated = `'${date.getFullYear()}-${String(date.getMonth()+1).padStart(2, "0")}-${date.getDate()}'`
+module.exports.reservation = (req, res) => {
+    // Used to reserve equipment.
+    // Post/Patch Request
 
+    const student_email = req.body.student_email
+    const staff_email = req.body.staff_email
+    const return_condition = req.body.return_condition
+    const loan_date = req.body.loan_date
+    const return_date = req.body.return_condition
+    const loan_id = req.body.loan_id
+    const item_id = req.body.item_id
 
-    con.query(`SELECT student_id, f_name, l_name, email FROM student WHERE whitecliffe_id = ${req.body.whitecliffe_id}`, function (err, result, fields) {
+    con.query(`select staff_id, f_name, l_name from staff where email = '${staff_email}'`, function (err, result) {
         if (err) {
-            console.log(`Query Error Code: ${err.code}`)
-            console.log(`Query Error Message: ${err.sqlMessage}`)
+            console.log(`Error Code: ${err.code}`)
+            console.log(`Error Message: ${err.sqlMessage}`)
             res.status(406).json({ response: 'rejected' })
         } else {
-            // Store student data in result. 
+            const staffData = result
+        }
+    })
+
+    const date = new Date()   
+    let lastUpdated = `'${date.getFullYear()}-${String(date.getMonth()+1).padStart(2, "0")}-${date.getDate()}'`
+    // Get student data
+    con.query(`select student_id, f_name, l_name where email = '${student_email}}'`, function(err, result) {
+        if (err) {
+            console.log(`Error Code: ${err.code}`)
+            console.log(`Error Message: ${err.sqlMessage}`)
+            res.status(406).json({ response: 'rejected' })
+        } else {
+            // Stores student data in a result
             var studentData = result
-            con.query(`INSERT INTO loan (student_id, item_id, loan_status, loan_date, return_date, last_updated) VALUES (${studentData[0].student_id}, ${req.body.item_id}, 'Pending', '${req.body.loan_date}', '${req.body.return_date}', ${lastUpdated})`, function (err, result, fields) {
-                if  (err) {
-                    console.log(`Query Error Code: ${err.code}`)
-                    console.log(`Query Error Message: ${err.sqlMessage}`)
-                    res.status(406).json({ response: 'rejected' })
-                } else {
-                    con.query(`SELECT * FROM item WHERE item_id = ${req.body.item_id}`, function (err, result, fields) {
+            let conflict = false
+
+            for (let index = 0; index < result.length; index++) {
+                if (result[index].loan_date < loan_date) {
+                    if (result[index].return_date >= loan_date) {
+                        conflict = true
+                    }
+                }
+            }
+
+            if (conflict === true) {
+                res.status(200).json({ response: 'Booking conflict.' })
+            } else {
+                if (loan_id === undefined) {
+                    // Checks if the loan_id is supplied, if it is not we know that it will be a post request
+                    con.query(`insert into  loan (student_id, item_id, loan_status, loan_date, return_date, last_updated) values (${studentData[0].student_id}, ${item_id}, 'Pending', '${loan_date}', '${return_date}', '${lastUpdated}')`, function (err, result) {
                         if (err) {
-                            console.log(`Query Error Code: ${err.code}`)
-                            console.log(`Query Error Message: ${err.sqlMessage}`)
+                            console.log(`Error Code: ${err.code}`)
+                            console.log(`Error Message: ${err.sqlMessage}`)
                             res.status(406).json({ response: 'rejected' })
                         } else {
-                            const transporter = nodemailer.createTransport({
+                            con.query(`select select loan_date, return_date from loan where item_id = ${item_id}`, function (err, result) {
+                                if (err) {
+                                    console.log(`Error Code: ${err.code}`)
+                                    console.log(`Error Message: ${err.sqlMessage}`)
+                                    res.status(406).json({ response: 'rejected' })
+                                } else {
+                                    const transport = nodemailer.createTransport({
+                                        service: 'Gmail',
+                                        auth: {
+                                            user: emailUser,
+                                            pass: emailPassword
+                                        }
+                                    })
+                    
+                                    const mailOption = {
+                                        from: emailUser,
+                                        to: student_email,
+                                        subject: `Loan Request for ${studentData[0].f_name} ${studentData[0].l_name}`,
+                                        text: `Hi ${studentData[0].f_name} ${studentData[0].l_name} your loan request has been submitted. `
+                                    }
+                    
+                                    transport.sendMail(mailOption, (error, info) => {
+                                        if (error) {
+                                            console.log('There was an error with nodemailer.')
+                                            console.log(error)
+                                            res.status(406).json({ response: 'nodemailer error' })
+                                        } else {
+                                            res.status(201).json({ response: 'Loan Request Submitted. Confirmation email sent.'})
+                                        }
+                                    })
+                                }
+                            })
+                            
+                        }
+                    })                
+                } else if (loan_status === 'Approved') {
+                    // If loan status is accepted we know its accepting it.
+                    con.query(`update loan set staff_id=${staffData[0].staff_id}, loan_status='Approved', last_updated='${lastUpdated}', loan_date='${loan_date}', return_date='${return_date}', return_condition='${return_condition}' where loan_id = ${loan_id}`, function (err, result) {
+                        if (err) {
+                            console.log(`Error Code: ${err.code}`)
+                            console.log(`Error Message: ${err.sqlMessage}`)
+                            res.status(406).json({ response: 'rejected' })
+                        } else {
+                            const transport = nodemailer.createTransport({
                                 service: 'Gmail',
                                 auth: {
                                     user: emailUser,
                                     pass: emailPassword
                                 }
                             })
-                            
+            
                             const mailOption = {
                                 from: emailUser,
-                                to: studentData[0].email,
+                                to: student_email,
                                 subject: `Loan Request for ${studentData[0].f_name} ${studentData[0].l_name}`,
-                                text: `Thank you for submitting a request for ${result[0].item_name}. The item should be approved by staff soon and you'll receive a confirmation email when it is complete.`
+                                text: `Hi ${studentData[0].f_name} ${studentData[0].l_name} your loan request has been approved. Please contact your lecturer for more information. `
                             }
-        
-                            transporter.sendMail(mailOption, (error, info) => {
+            
+                            transport.sendMail(mailOption, (error, info) => {
                                 if (error) {
+                                    console.log('There was an error with nodemailer.')
                                     console.log(error)
-                                    res.status(406).json({ response: 'rejected' })
+                                    res.status(406).json({ response: 'nodemailer error' })
                                 } else {
-                                    // Sends a response back to the user that loan request has been submitted has been submitted.
-                                    res.status(201).json({ response: `Loan Request Submitted for ${studentData[0].f_name} ${studentData[0].l_name}.`})      
+                                    res.status(201).json({ response: 'Loan Request Declined. Confirmation email sent.'})
                                 }
                             })
                         }
-                    })
-                    
-                }
-            })
-        }
-    })
-}
- 
-module.exports.loan_approve = (req, res) => {
-    // Patch Request
-    // Takes in two o
-
-    const date = new Date()   
-    let lastUpdated = `'${date.getFullYear()}-${String(date.getMonth()+1).padStart(2, "0")}-${date.getDate()}'`
-
-    // 1. Get loan information based on the ID parsed in
-    // 2. Get student information based on the loan data. 
-    // 3. Update loan data based on the teachers staff code which will be parsed into the request. (Will first need to retrieve this. )
-    con.query(`select * from loan where loan_id = ${req.body.loan_id}`, function (err, result) {
-        if (err) {
-            console.log(`Error Code: ${err.code}`)
-            console.log(`Error Message: ${err.sqlMessage}`)
-            res.status(406).json({ response: 'rejected' })
-        } else {
-            var loanData = result[0]
-            con.query(`select f_name, l_name, email from student where student_id = ${loanData.student_id}`, function (err, result) {
-                if (err) {
-                    console.log(`Error Code: ${err.code}`)
-                    console.log(`Error Message: ${err.sqlMessage}`)
-                    res.status(406).json({ response: 'rejected' })
-                } else {
-                    var studentData = result[0]
-                    con.query(`select staff_id, f_name, l_name from staff where staff_code = ${req.body.staff_code}`, function (err, result) {
+                    }) 
+                } else if (loan_status === 'Declined') {
+                    con.query(`update loan set staff_id=${staffData[0].staff_id}, loan_status='Declined', last_updated='${lastUpdated}' where loan_id = ${loan_id}`, function (err, result) {
                         if (err) {
                             console.log(`Error Code: ${err.code}`)
                             console.log(`Error Message: ${err.sqlMessage}`)
                             res.status(406).json({ response: 'rejected' })
                         } else {
-                            var staffData = result[0]
-                            con.query(`update loan set staff_id=${staffData.staff_id}, loan_status='Approved', last_updated = '${lastUpdated}, loan_date = '${req.body.loan_date}', return_date = '${req.body.return_date}' where loan_id=${req.body.loan_id}`, function (err, result) {
-                                if (err) {
-                                    console.log(`Error Code: ${err.code}`)
-                                    console.log(`Error Message: ${err.sqlMessage}`)
-                                    res.status(406).json({ response: 'rejected' })
+                            // We know its being declined.
+                            const transport = nodemailer.createTransport({
+                                service: 'Gmail',
+                                auth: {
+                                    user: emailUser,
+                                    pass: emailPassword
+                                }
+                            })
+            
+                            const mailOption = {
+                                from: emailUser,
+                                to: student_email,
+                                subject: `Loan Request for ${studentData[0].f_name} ${studentData[0].l_name}`,
+                                text: `Hi ${studentData[0].f_name} ${studentData[0].l_name} your loan request has unfortuantely been declined. Please contact your lecturer for more information. `
+                            }
+            
+                            transport.sendMail(mailOption, (error, info) => {
+                                if (error) {
+                                    console.log('There was an error with nodemailer.')
+                                    console.log(error)
+                                    res.status(406).json({ response: 'nodemailer error' })
                                 } else {
-                                    con.query(`select item_name from item where item_id = ${loanData.item_id}`, function (err, result) {
-                                        if (err) {
-                                            console.log(`Error Code: ${err.code}`)
-                                            console.log(`Error Message: ${err.sqlMessage}`)
-                                            res.status(406).json({ response: 'rejected' })
-                                        } else {
-                                            var itemData = result[0]
-                                            const transporter = nodemailer.createTransport({
-                                                service: 'Gmail',
-                                                auth: {
-                                                    user: emailUser,
-                                                    pass: emailPassword
-                                                }
-                                            })
-
-                                            const mailOption = {
-                                                from: emailUser,
-                                                to: studentData.email,
-                                                subject: `Loan Request for ${itemData.item_name} has been approved.`,
-                                                text: `Hi, ${studentData.f_name} ${studentData.l_name} Your loan request for ${itemData.item_name} has been approved by ${staffData.f_name} ${staffData.l_name}.`
-                                            }
-
-                                            transporter.sendMail(mailOption, (error, info) => {
-                                                if (error) {
-                                                    console.log(error)
-                                                    res.status(406).json({ response: 'rejected' })
-                                                } else {
-                                                    res.status(201).json({ response: `Loan Request has been approved for ${studentData.f_name} ${studentData.l_name}`})
-                                                }
-                                            })
-                                        }
-                                    })
+                                    res.status(201).json({ response: 'Loan Request Declined. Confirmation email sent.'})
                                 }
                             })
                         }
                     })
+                         
                 }
-            })
-        }
-    })
-}
-
-module.exports.loan_decline = (req, res) => {
-     // Patch Request
-    // Takes in two o
-    console.log(1)
-    const date = new Date()   
-    let lastUpdated = `'${date.getFullYear()}-${String(date.getMonth()+1).padStart(2, "0")}-${date.getDate()}'`
-
-    // 1. Get loan information based on the ID parsed in
-    // 2. Get student information based on the loan data. 
-    // 3. Update loan data based on the teachers staff code which will be parsed into the request. (Will first need to retrieve this. )
-    con.query(`select * from loan where loan_id = ${req.body.loan_id}`, function (err, result) {
-        if (err) {
-            console.log(`Error Code: ${err.code}`)
-            console.log(`Error Message: ${err.sqlMessage}`)
-            res.status(406).json({ response: 'rejected' })
-        } else {
-            var loanData = result[0]
-            con.query(`select f_name, l_name, email from student where student_id = ${loanData.student_id}`, function (err, result) {
-                if (err) {
-                    console.log(`Error Code: ${err.code}`)
-                    console.log(`Error Message: ${err.sqlMessage}`)
-                    res.status(406).json({ response: 'rejected' })
-                } else {
-                    var studentData = result[0]
-                    con.query(`select staff_id, f_name, l_name from staff where staff_code = ${req.body.staff_code}`, function (err, result) {
-                        if (err) {
-                            console.log(`Error Code: ${err.code}`)
-                            console.log(`Error Message: ${err.sqlMessage}`)
-                            res.status(406).json({ response: 'rejected' })
-                        } else {
-                            var staffData = result[0]
-                            con.query(`update loan set staff_id=${staffData.staff_id}, loan_status='Declined', last_updated = '${lastUpdated}' where loan_id=${req.body.loan_id}`, function (err, result) {
-                                if (err) {
-                                    console.log(`Error Code: ${err.code}`)
-                                    console.log(`Error Message: ${err.sqlMessage}`)
-                                    res.status(406).json({ response: 'rejected' })
-                                } else {
-                                    con.query(`select item_name from item where item_id = ${loanData.item_id}`, function (err, result) {
-                                        if (err) {
-                                            console.log(`Error Code: ${err.code}`)
-                                            console.log(`Error Message: ${err.sqlMessage}`)
-                                            res.status(406).json({ response: 'rejected' })
-                                        } else {
-                                            var itemData = result[0]
-                                            const transporter = nodemailer.createTransport({
-                                                service: 'Gmail',
-                                                auth: {
-                                                    user: emailUser,
-                                                    pass: emailPassword
-                                                }
-                                            })
-
-                                            const mailOption = {
-                                                from: emailUser,
-                                                to: studentData.email,
-                                                subject: `Loan Request for ${itemData.item_name} has been declined.`,
-                                                text: `Hi, ${studentData.f_name} ${studentData.l_name} Your loan request for ${itemData.item_name} has been declined by ${staffData.f_name} ${staffData.l_name}. Please enquire with your lecturer as to why. `
-                                            }
-
-                                            transporter.sendMail(mailOption, (error, info) => {
-                                                if (error) {
-                                                    console.log(error)
-                                                    res.status(406).json({ response: 'rejected' })
-                                                } else {
-                                                    res.status(201).json({ response: `Loan Request has been declined for ${studentData.f_name} ${studentData.l_name}`})
-                                                }
-                                            })
-                                        }
-                                    })
-                                }
-                            })
-                        }
-                    })
-                }
-            })
-        }
-    })
-}
-
-module.exports.status_date = (req, res) => {
-    // POST request used to find the items and there available statuses
-    // For example whether an item is pending or not pending etc. 
-    // Start and End Date should be parsed in
-
-    // Step 1. Get all items. 
-    // Step 2. Get loan status for all items. 
-    var results = []
-    con.query('select * from item', function (err, result) {
-        if (err) {
-            console.log(`Error Code: ${err.code}`)
-            console.log(`Error Message: ${err.sqlMessage}`)
-            res.status(406).json({ response: 'rejected' })
-        } else {
-            console.log(result)
-            let item_data = result
-            for (let index = 0; index < item_data.length; index++) {
-                console.log('First for loop was hit');
-                con.query(`select loan_status from loan where item_id = '${item_data[index].item_id}' and loan_date = '${req.body.loan_date}' and return_date = '${req.body.return_date}'`, function (err, result) {
-                    if (err) {
-                        console.log(`Error Code: ${err.code}`)
-                        console.log(`Error Message: ${err.sqlMessage}`)
-                        res.status(406).json({ response: 'rejected' })
-                    } else {
-                        console.log(result)
-                        if (result.length === 0) {
-                            results.push({
-                                item_id: item_data[index].item_id,
-                                item_name: item_data[index].item_name,
-                                loan_status: 'Available'
-                            })
-                        } else {
-                            results.push({
-                                item_id: item_data[index].item_id,
-                                item_name: item_data[index].item_name,
-                                loan_status: result[0].loan_status
-                            })
-                        }
-                        
-                    }
-                })
             }
-
-            console.log(results)
-            res.status(200).json({results})
         }
     })
+
+    
+
 }
 
 module.exports.get_requests = (req, res) => {
-    // Get Pending Requests
-    con.query("select * from loan where loan_status = 'Pending'", function (err, result) {
+    con.query("select loan.loan_id, student.email, item.item_name, student.f_name, student.l_name, loan.loan_date, loan.return_date from ((loan inner join student on loan.student_id = student.student_id) inner join item on loan.item_id = item.item_id)", function (err, result) {
         if (err) {
             console.log(`Error Code: ${err.code}`)
             console.log(`Error Message: ${err.sqlMessage}`)
-            res.status(406).json({ response: "Error With Getting Pending Requests" })
+            res.status(406).json({ response: 'rejected' })
         } else {
             if (result.length === 0) {
-                res.status(200).json({ response: "No requests found." })
-            } else {
-                res.status(200).json({ result })
+                res.status(404).json({ response: 'No data found.'   })
             }
+            res.status(200).json({result})
         }
     })
 }
