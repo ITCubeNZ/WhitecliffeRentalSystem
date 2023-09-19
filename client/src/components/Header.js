@@ -8,6 +8,7 @@ import { UserContext } from "../App";
 
 const Header = () => {
   const user = useContext(UserContext);
+  const isStudent = useContext(UserContext);
   const { instance } = useMsal();
 
   const handleLogout = () => {
@@ -37,14 +38,15 @@ const Header = () => {
                   </Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                  <Nav.Link as={Link} to={"/dashboard"}>
-                    Dashboard
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link as={Link} to={"/teacher"}>
-                    Teacher
-                  </Nav.Link>
+                  {isStudent ? (
+                    <Nav.Link as={Link} to={"/student"}>
+                      Dashboard
+                    </Nav.Link>
+                  ) : (
+                    <Nav.Link as={Link} to={"/teacher"}>
+                      Teacher
+                    </Nav.Link>
+                  )}
                 </Nav.Item>
               </Nav>
 
