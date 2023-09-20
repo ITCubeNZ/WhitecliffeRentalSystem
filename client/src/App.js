@@ -12,13 +12,14 @@ import Book from "./components/Book";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import EquipmentTable from "./components/EquipmentTable";
+import EquipmentTable from "./components/equipmentTable";
 
 export const UserContext = createContext();
 
 function App() {
   useMsalAuthentication(InteractionType.Popup);
   const [user, setUser] = useState("");
+  const [isStudent, setIsStudent] = useState(true);
 
   function Render() {
     const { accounts } = useMsal();
@@ -26,12 +27,14 @@ function App() {
     try {
       const username = accounts[0].username;
       setUser(username);
+      setIsStudent(true);
     } catch (e) {}
   }
+  console.log(user);
   if (user !== "")
     return (
       <div className="App">
-        <UserContext.Provider value={user}>
+        <UserContext.Provider value={[user, isStudent]}>
           <UnauthenticatedTemplate>
             <Login />
           </UnauthenticatedTemplate>
@@ -43,8 +46,7 @@ function App() {
                 <Routes>
                   <Route path="/" exact element={<EquipmentTable />}></Route>
                   <Route path="/book" element={<Book />}></Route>
-                  <Route path="/dashboard" element={<StudentDashBoard />}></Route>
-                  <Route path="/teacher" element={<TeacherDashBoard />}></Route>
+                  {isStudent ? <Route path="/student" element={<StudentDashBoard />}></Route> : <Route path="/teacher" element={<TeacherDashBoard />}></Route>}
                 </Routes>
               </Container>
             </div>
