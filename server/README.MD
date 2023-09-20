@@ -68,3 +68,18 @@ If a student is requesting an item. It is only necessary to provide student_emai
 
 If a teacher is wanting to approve or decline a loan request, all information should be parsed into it as a PATCH request. This will update the data within the database and send an updated email to the users. 
 
+
+### /api/search
+
+This is a POST request that takes in a name "item_name" and returns all values with a result that contains this name. If no data is found a 404 Response will be rendered with "No data was found." 
+
+
+### /api/search/code
+
+This is a POST request that searches based on the item code. POST requests should have one paramater "code" which equates to the item_code. 
+
+
+### /api/search/location
+
+This is a POST request that searches based on the item location. Post requests should have one paramter "location" which equates to the item locaiton. 
+

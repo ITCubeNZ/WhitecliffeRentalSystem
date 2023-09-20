@@ -7,7 +7,8 @@ var con = mysql.createConnection({
     password: dbPassword,
     database: "whitecliffe",
     port: 3306,
-    useSSL: true
+    useSSL: true,
+    timezone: 'Pacific/Auckland' 
 })
 
 con.connect(function(error)  {
