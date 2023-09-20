@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import Table from "react-bootstrap/Table";
-import EquipmentModal from "./EquipmentModal";
+import EquipmentModal from "./equipmentModal";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useState } from "react";
 import Button from "react-bootstrap/Button";
