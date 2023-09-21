@@ -316,25 +316,25 @@ const rentalSQL =
           <p style={{backgroundColor: '#212529', color: '#ffffff'}} >
             <b>Item Details - </b> 
           </p>
-          <p >
+          <p style={{color: '#000000'}}>
             <b>Item Name: </b> {itemSQL.name}
           </p>
-          <p >
+          <p style={{color: '#000000'}}>
             <b>Item ID: </b> {itemSQL.item_id}
           </p>
           <p style={{backgroundColor: '#212529', color: '#ffffff'}}>
             <b>Booked For - </b> 
           </p>
-          <p >
+          <p style={{color: '#000000'}}>
             <b>Name: </b> {studentSQL.f_name} {studentSQL.l_name}
           </p>
-          <p >
+          <p style={{color: '#000000'}}>
             <b>Student ID: </b> {studentSQL.student_id}
           </p>
           <p style={{backgroundColor: '#212529', color: '#ffffff'}}>
             <b >Weeks Booked - </b> 
           </p>
-          <p >
+          <p style={{color: '#000000'}}>
             <b>First Week To Book - : </b> {firstWeekChoice?.map((date) => <li >{date[0]} to {date[1]}</li>)}
           </p>
        
