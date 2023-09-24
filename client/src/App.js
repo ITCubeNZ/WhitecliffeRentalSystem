@@ -4,7 +4,7 @@ import { Container } from "react-bootstrap";
 import { useMsal, useMsalAuthentication } from "@azure/msal-react";
 import { InteractionType } from "@azure/msal-browser";
 import { AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
-import Home from "./components/Home";
+
 import Login from "./components/Login";
 import TeacherDashBoard from "./components/TeacherDashBoard";
 import StudentDashBoard from "./components/StudentDashBoard";
@@ -13,7 +13,7 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import EquipmentTable from "./components/EquipmentTable";
-
+import BookingForStudent from "./components/BookingForTeacher";
 export const UserContext = createContext();
 
 function App() {
@@ -21,16 +21,28 @@ function App() {
   const [user, setUser] = useState("");
   const [isStudent, setIsStudent] = useState(true);
 
+  // async function getUserInfo() {
+  //   const response = await fetch("/.auth/me");
+  //   const payload = await response.json();
+  //   const { clientPrincipal } = payload;
+  //   return clientPrincipal;
+  // }
+
+  // (async () => {
+  //   console.log(await getUserInfo());
+  // })();
+
   function Render() {
     const { accounts } = useMsal();
 
     try {
       const username = accounts[0].username;
       setUser(username);
-      setIsStudent(true);
+      setIsStudent(false);
     } catch (e) {}
   }
   console.log(user);
+  console.log(isStudent);
   if (user !== "")
     return (
       <div className="App">
@@ -46,7 +58,7 @@ function App() {
                 <Routes>
                   <Route path="/" exact element={<EquipmentTable />}></Route>
                   <Route path="/book" element={<Book />}></Route>
-                  {isStudent ? <Route path="/student" element={<StudentDashBoard />}></Route> : <Route path="/teacher" element={<TeacherDashBoard />}></Route>}
+                  {isStudent ? <Route path="/student" element={<StudentDashBoard />}></Route> : <Route path="/teacher" element={<BookingForStudent />}></Route>}
                 </Routes>
               </Container>
             </div>
