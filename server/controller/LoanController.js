@@ -168,7 +168,7 @@ module.exports.reservation = (req, res) => {
 
     let conflict = false;
 
-    con.query(`select loan_id, loan_date, return_date from loan where item_id = ${item_id} and loan_status != 'Declined' and loan_id != ${loan_id}` , function (err, result) {
+    con.query(`select loan_id, loan_date, return_date from loan where item_id = ${item_id} and loan_status != 'Declined'` , function (err, result) {
         if (err) {
             console.log(`Error Code: ${err.code}`)
             console.log(`Error Message: ${err.sqlMessage}`);
@@ -178,19 +178,23 @@ module.exports.reservation = (req, res) => {
                 for (let index = 0; index < result.length; index++) {
                     let tempLoanDate = JSON.stringify(result[index].loan_date)
                     let tempReturnDate = JSON.stringify(result[index].return_date)
-                    
-                     
-                    if (tempLoanDate > loan_date && tempReturnDate < return_date) {
-                        conflict = true
-                    } else if (tempLoanDate < loan_date && tempReturnDate < return_date) {
-                        conflict = true
-                    } else if (tempLoanDate === loan_date) {
-                        conflict = true
-                    } else if (tempReturnDate === loan_date) {
-                        conflict = true
-                    } else if (tempReturnDate === return_date) {
-                        conflict = true
-                    }      
+
+                    if (loan_date > tempReturnDate) {
+                        continue
+                    } else {
+                        if (tempLoanDate > loan_date && tempReturnDate < return_date) {
+                            conflict = true
+                        } else if (tempLoanDate < loan_date && tempReturnDate < return_date) {
+                            conflict = true
+                        } else if (tempLoanDate === loan_date) {
+                            conflict = true
+                        } else if (tempReturnDate === loan_date) {
+                            conflict = true
+                        } else if (tempReturnDate === return_date) {
+                            conflict = true
+                        }      
+                    }
+
                 }
             }
             
@@ -281,7 +285,6 @@ module.exports.reservation = (req, res) => {
                                                                 console.log(`Error Message: ${err.sqlMessage}`)
                                                                 res.status(406).json({ response: 'rejected' })
                                                             } else {
-                                                                console.log('again testing')
                                                                 const transport = nodemailer.createTransport({
                                                                     service: 'Gmail',
                                                                     auth: {
@@ -294,7 +297,7 @@ module.exports.reservation = (req, res) => {
                                                                     from: emailUser,
                                                                     to: student_email,
                                                                     subject: `Loan Request for ${result[0].item_name}`,
-                                                                    text: `Hi ${studentData[0].f_name} ${studentData[0].l_name}. Your loan request for ${result[0].item_name} has been approved for ${loan_date} - ${return_date}.`
+                                                                    text: `Hi ${studentData[0].f_name} ${studentData[0].l_name}. Your loan request for ${result[0].item_name} has been approved for ${loan_date} - ${return_date} by ${staffData[0].f_name}, ${staffData[0].l_name}.`
                                                                 }
             
                                                                 transport.sendMail(mailOption, (error, info) => {
@@ -347,7 +350,7 @@ module.exports.reservation = (req, res) => {
                                                                     from: emailUser,
                                                                     to: student_email,
                                                                     subject: `Loan Request for ${result[0].item_name}`,
-                                                                    text: `Hi ${studentData[0].f_name} ${studentData[0].l_name}. Your loan request for ${result[0].item_name} has been declined. Please contact your lecturer for more information..`
+                                                                    text: `Hi ${studentData[0].f_name} ${studentData[0].l_name}. Your loan request for ${result[0].item_name} has been declined. Please contact your lecturer for more information.`
                                                                 }
             
                                                                 transport.sendMail(mailOption, (error, info) => {
