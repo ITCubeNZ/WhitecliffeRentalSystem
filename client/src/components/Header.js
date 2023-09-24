@@ -38,7 +38,7 @@ const Header = () => {
                   </Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                  {isStudent ? (
+                  {isStudent[1] ? (
                     <Nav.Link as={Link} to={"/student"}>
                       Dashboard
                     </Nav.Link>
