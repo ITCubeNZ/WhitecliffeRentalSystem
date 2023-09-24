@@ -13,7 +13,7 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import EquipmentTable from "./components/equipmentTable";
-
+import BookingForStudent from "./components/BookingForTeacher";
 export const UserContext = createContext();
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
     try {
       const username = accounts[0].username;
       setUser(username);
-      setIsStudent(true);
+      setIsStudent(false);
     } catch (e) {}
   }
   console.log(user);
@@ -46,7 +46,7 @@ function App() {
                 <Routes>
                   <Route path="/" exact element={<EquipmentTable />}></Route>
                   <Route path="/book" element={<Book />}></Route>
-                  {isStudent ? <Route path="/student" element={<StudentDashBoard />}></Route> : <Route path="/teacher" element={<TeacherDashBoard />}></Route>}
+                  {isStudent ? <Route path="/student" element={<StudentDashBoard />}></Route> : <Route path="/teacher" element={<BookingForStudent />}></Route>}
                 </Routes>
               </Container>
             </div>
