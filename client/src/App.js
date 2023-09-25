@@ -27,7 +27,7 @@ function App() {
     try {
       const username = accounts[0].username;
       setUser(username);
-      setIsStudent(true);
+      setIsStudent(false);
     } catch (e) {}
   }
   console.log(user);
